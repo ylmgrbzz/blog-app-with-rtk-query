@@ -55,7 +55,7 @@ export const api = createApi({
       query: (newPost) => ({
         url: "/posts",
         method: "POST",
-        body: newPost,
+        body: { ...newPost, isActive: true },
       }),
       invalidatesTags: ["Post"],
       async onQueryStarted(newPost, { dispatch, queryFulfilled }) {

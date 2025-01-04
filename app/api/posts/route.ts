@@ -38,6 +38,9 @@ export async function POST(request: Request) {
     await connectDB();
 
     const body = await request.json();
+    if (body.isActive === undefined) {
+      body.isActive = true;
+    }
     const post = await Post.create(body);
 
     return NextResponse.json(post, { status: 201 });

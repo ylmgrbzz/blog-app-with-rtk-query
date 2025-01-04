@@ -1,20 +1,14 @@
+// Post model definition (MongoDB)
 import mongoose from "mongoose";
 
-const PostSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-      required: [true, "Başlık zorunludur"],
-      trim: true,
-    },
-    content: {
-      type: String,
-      required: [true, "İçerik zorunludur"],
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+const postSchema = new mongoose.Schema({
+  title: String,
+  content: String,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+  isActive: { type: Boolean, default: true },
+});
 
-export default mongoose.models.Post || mongoose.model("Post", PostSchema);
+const Post = mongoose.model("Post", postSchema);
+
+export default Post;
