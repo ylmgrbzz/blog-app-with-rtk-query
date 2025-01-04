@@ -57,36 +57,20 @@ export const api = createApi({
         method: "POST",
         body: newPost,
       }),
+      invalidatesTags: ["Post"],
       async onQueryStarted(newPost, { dispatch, queryFulfilled }) {
-        // Geçici bir ID oluştur
-        const tempId = Date.now().toString();
-        // Optimistic update - UI'a hemen ekle
-        const patchResult = dispatch(
-          api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
-            draft.data.unshift({
-              _id: tempId,
-              ...newPost,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            });
-            draft.total += 1;
-            draft.totalPages = Math.ceil(draft.total / 10);
-          })
-        );
         try {
           const { data: createdPost } = await queryFulfilled;
-          // Başarılı olduğunda geçici post'u gerçek post ile değiştir
+
           dispatch(
             api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
-              const tempPost = draft.data.find((post) => post._id === tempId);
-              if (tempPost) {
-                Object.assign(tempPost, createdPost);
-              }
+              draft.data.unshift(createdPost);
+              draft.total += 1;
+              draft.totalPages = Math.ceil(draft.total / 10);
             })
           );
         } catch {
-          // Hata durumunda değişiklikleri geri al
-          patchResult.undo();
+          // Hata durumunda bir şey yapma
         }
       },
     }),
