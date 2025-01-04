@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RTK Query Blog Uygulaması
 
-## Getting Started
+Modern ve kullanıcı dostu bir blog yönetim sistemi. Redux Toolkit Query, Next.js ve TailwindCSS kullanılarak geliştirilmiştir.
 
-First, run the development server:
+![RTK Query Blog](./preview.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Özellikler
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- ✨ Modern ve responsive tasarım
+- 📱 Mobil uyumlu arayüz
+- 📝 Blog gönderisi oluşturma, düzenleme ve silme
+- 🔄 Sayfalama sistemi (her sayfada 10 gönderi)
+- ⚡ Optimistic Updates ile anlık UI güncellemeleri
+- 🎯 RTK Query ile etkin state yönetimi
+- 🎨 TailwindCSS ile modern görünüm
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Teknolojiler
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [Next.js](https://nextjs.org/) - React framework
+- [Redux Toolkit Query](https://redux-toolkit.js.org/rtk-query/overview) - Veri yönetimi
+- [TailwindCSS](https://tailwindcss.com/) - Stil ve tasarım
+- [TypeScript](https://www.typescriptlang.org/) - Tip güvenliği
 
-## Learn More
+### Blog Gönderisi Oluşturma
 
-To learn more about Next.js, take a look at the following resources:
+- Ana sayfadaki form aracılığıyla yeni blog gönderisi oluşturabilirsiniz
+- Başlık ve içerik alanlarını doldurmanız yeterli
+- Gönderi otomatik olarak listenin en başına eklenecektir
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Gönderileri Görüntüleme
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Ana sayfada tüm gönderiler listelenir
+- Her sayfada 10 gönderi gösterilir
+- Sayfalama kontrolleri ile gönderiler arasında gezinebilirsiniz
 
-## Deploy on Vercel
+### Gönderi Düzenleme ve Silme
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Her gönderinin detay sayfasında düzenleme yapabilirsiniz
+- Silme işlemi hem ana sayfadan hem de detay sayfasından yapılabilir
+- Tüm değişiklikler anlık olarak UI'da görüntülenir
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📝 Proje Yapısı
+
+\`\`\`
+rtk-query-blog/
+├── app/
+│ ├── posts/ # Post detay sayfaları
+│ ├── store/ # Redux store ve RTK Query servisleri
+│ ├── layout.tsx # Ana sayfa düzeni
+│ └── page.tsx # Ana sayfa
+├── public/ # Statik dosyalar
+├── styles/ # Global stiller
+├── package.json # Proje bağımlılıkları
+└── README.md # Proje dokümantasyonu
+\`\`\`
