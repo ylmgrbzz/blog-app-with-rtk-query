@@ -93,23 +93,24 @@ export const api = createApi({
         url: `/posts/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: (_result, _error, id) => [{ type: "Post", id }, "Post"],
       async onQueryStarted(id, { dispatch, queryFulfilled }) {
-        // Optimistic update - UI'dan hemen kaldır
-        const patchResult = dispatch(
-          api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
-            draft.data = draft.data.filter((post) => post._id !== id);
-            draft.total -= 1;
-            draft.totalPages = Math.ceil(draft.total / 10);
-          })
-        );
         try {
+          // Önce API isteğinin tamamlanmasını bekle
           await queryFulfilled;
+
+          // Sonra UI'ı güncelle
+          dispatch(
+            api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
+              draft.data = draft.data.filter((post) => post._id !== id);
+              draft.total -= 1;
+              draft.totalPages = Math.ceil(draft.total / 10);
+            })
+          );
         } catch {
-          // Hata durumunda değişiklikleri geri al
-          patchResult.undo();
+          // Hata durumunda bir şey yapma
         }
       },
-      invalidatesTags: (_result, _error, id) => [{ type: "Post", id }],
     }),
   }),
 });
