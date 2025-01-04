@@ -37,7 +37,31 @@ export const api = createApi({
         method: "POST",
         body: newPost,
       }),
-      invalidatesTags: ["Post"],
+      async onQueryStarted(newPost, { dispatch, queryFulfilled }) {
+        // Geçici bir ID oluştur
+        const tempId = Date.now();
+        // Optimistic update - UI'a hemen ekle
+        const patchResult = dispatch(
+          api.util.updateQueryData("getPosts", undefined, (draft) => {
+            draft.unshift({ ...newPost, id: tempId });
+          })
+        );
+        try {
+          const { data: createdPost } = await queryFulfilled;
+          // Başarılı olduğunda geçici post'u gerçek post ile değiştir
+          dispatch(
+            api.util.updateQueryData("getPosts", undefined, (draft) => {
+              const tempPost = draft.find((post) => post.id === tempId);
+              if (tempPost) {
+                Object.assign(tempPost, createdPost);
+              }
+            })
+          );
+        } catch {
+          // Hata durumunda değişiklikleri geri al
+          patchResult.undo();
+        }
+      },
     }),
 
     // Post güncelle
@@ -56,6 +80,20 @@ export const api = createApi({
         url: `/posts/${id}`,
         method: "DELETE",
       }),
+      async onQueryStarted(id, { dispatch, queryFulfilled }) {
+        // Optimistic update - UI'dan hemen kaldır
+        const patchResult = dispatch(
+          api.util.updateQueryData("getPosts", undefined, (draft) => {
+            return draft.filter((post) => post.id !== id);
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          // Hata durumunda değişiklikleri geri al
+          patchResult.undo();
+        }
+      },
       invalidatesTags: (_result, _error, id) => [{ type: "Post", id }],
     }),
   }),

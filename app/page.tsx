@@ -27,6 +27,14 @@ export default function Home() {
     }
   };
 
+  const handleDelete = async (postId: number) => {
+    try {
+      await deletePost(postId).unwrap();
+    } catch (error) {
+      console.error("Post silinirken hata:", error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -119,7 +127,7 @@ export default function Home() {
                 </p>
                 <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                   <button
-                    onClick={() => deletePost(post.id)}
+                    onClick={() => handleDelete(post.id)}
                     className="text-red-500 hover:text-red-700 font-medium text-sm flex items-center gap-1 transition duration-200"
                   >
                     <svg
