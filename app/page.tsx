@@ -11,8 +11,17 @@ import {
 export default function Home() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: posts, isLoading, error } = useGetPostsQuery();
+  const {
+    data: postsData,
+    isLoading,
+    error,
+  } = useGetPostsQuery({
+    page: currentPage,
+    limit: 10,
+  });
+
   const [createPost] = useCreatePostMutation();
   const [deletePost] = useDeletePostMutation();
 
@@ -32,6 +41,19 @@ export default function Home() {
       await deletePost(postId).unwrap();
     } catch (error) {
       console.error("Post silinirken hata:", error);
+    }
+  };
+
+  // Sayfalama kontrolleri
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (postsData && currentPage < postsData.totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
@@ -110,8 +132,8 @@ export default function Home() {
         </div>
 
         {/* Post Listesi */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {posts?.map((post) => (
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-8">
+          {postsData?.data.map((post) => (
             <article
               key={post.id}
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300"
@@ -171,6 +193,67 @@ export default function Home() {
             </article>
           ))}
         </div>
+
+        {/* Sayfalama Kontrolleri */}
+        {postsData && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                currentPage === 1
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Önceki
+            </button>
+
+            <span className="text-gray-600">
+              Sayfa {currentPage} / {postsData.totalPages}
+            </span>
+
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === postsData.totalPages}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                currentPage === postsData.totalPages
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              Sonraki
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
     </main>
   );

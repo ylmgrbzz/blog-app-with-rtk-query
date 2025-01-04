@@ -11,6 +11,18 @@ interface CreatePostRequest {
   content: string;
 }
 
+interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+interface GetPostsArgs {
+  page: number;
+  limit?: number;
+}
+
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
@@ -18,9 +30,28 @@ export const api = createApi({
   }),
   tagTypes: ["Post"],
   endpoints: (builder) => ({
-    // Tüm postları getir
-    getPosts: builder.query<Post[], void>({
-      query: () => "/posts",
+    // Tüm postları getir (Sayfalı)
+    getPosts: builder.query<PaginatedResponse<Post>, GetPostsArgs>({
+      query: ({ page, limit = 10 }) => ({
+        url: "/posts",
+        params: {
+          _page: page,
+          _limit: limit,
+        },
+      }),
+      transformResponse(response: Post[], meta) {
+        const total = Number(meta?.response?.headers.get("x-total-count") || 0);
+        const currentPage = Number(meta?.request?.params?._page || 1);
+        const limit = Number(meta?.request?.params?._limit || 10);
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+          data: response,
+          total,
+          currentPage,
+          totalPages,
+        };
+      },
       providesTags: ["Post"],
     }),
 
@@ -42,16 +73,18 @@ export const api = createApi({
         const tempId = Date.now();
         // Optimistic update - UI'a hemen ekle
         const patchResult = dispatch(
-          api.util.updateQueryData("getPosts", undefined, (draft) => {
-            draft.unshift({ ...newPost, id: tempId });
+          api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
+            draft.data.unshift({ ...newPost, id: tempId });
+            draft.total += 1;
+            draft.totalPages = Math.ceil(draft.total / 10);
           })
         );
         try {
           const { data: createdPost } = await queryFulfilled;
           // Başarılı olduğunda geçici post'u gerçek post ile değiştir
           dispatch(
-            api.util.updateQueryData("getPosts", undefined, (draft) => {
-              const tempPost = draft.find((post) => post.id === tempId);
+            api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
+              const tempPost = draft.data.find((post) => post.id === tempId);
               if (tempPost) {
                 Object.assign(tempPost, createdPost);
               }
@@ -83,8 +116,10 @@ export const api = createApi({
       async onQueryStarted(id, { dispatch, queryFulfilled }) {
         // Optimistic update - UI'dan hemen kaldır
         const patchResult = dispatch(
-          api.util.updateQueryData("getPosts", undefined, (draft) => {
-            return draft.filter((post) => post.id !== id);
+          api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
+            draft.data = draft.data.filter((post) => post.id !== id);
+            draft.total -= 1;
+            draft.totalPages = Math.ceil(draft.total / 10);
           })
         );
         try {
