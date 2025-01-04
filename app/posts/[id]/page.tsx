@@ -10,8 +10,8 @@ import {
 
 export default function PostPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const resolvedParams = use(params);
-  const postId = parseInt(resolvedParams.id);
+  const postId = params.id;
+
   const { data: post, isLoading, error } = useGetPostQuery(postId);
   const [updatePost] = useUpdatePostMutation();
   const [deletePost] = useDeletePostMutation();
@@ -20,7 +20,6 @@ export default function PostPage({ params }: { params: { id: string } }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  // Edit moduna geçerken mevcut değerleri form'a doldur
   const handleEditClick = () => {
     if (post) {
       setTitle(post.title);
@@ -32,7 +31,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await updatePost({ id: postId, title, content }).unwrap();
+      await updatePost({ _id: postId, title, content }).unwrap();
       setIsEditing(false);
     } catch (error) {
       console.error("Post güncellenirken hata:", error);

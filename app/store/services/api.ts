@@ -1,9 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 interface Post {
-  id: number;
+  _id: string;
   title: string;
   content: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface CreatePostRequest {
@@ -26,7 +28,7 @@ interface GetPostsArgs {
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseUrl: "/api",
   }),
   tagTypes: ["Post"],
   endpoints: (builder) => ({
@@ -39,24 +41,11 @@ export const api = createApi({
           _limit: limit,
         },
       }),
-      transformResponse(response: Post[], meta) {
-        const total = Number(meta?.response?.headers.get("x-total-count") || 0);
-        const currentPage = Number(meta?.request?.params?._page || 1);
-        const limit = Number(meta?.request?.params?._limit || 10);
-        const totalPages = Math.ceil(total / limit);
-
-        return {
-          data: response,
-          total,
-          currentPage,
-          totalPages,
-        };
-      },
       providesTags: ["Post"],
     }),
 
     // Tekil post getir
-    getPost: builder.query<Post, number>({
+    getPost: builder.query<Post, string>({
       query: (id) => `/posts/${id}`,
       providesTags: (_result, _error, id) => [{ type: "Post", id }],
     }),
@@ -70,11 +59,16 @@ export const api = createApi({
       }),
       async onQueryStarted(newPost, { dispatch, queryFulfilled }) {
         // Geçici bir ID oluştur
-        const tempId = Date.now();
+        const tempId = Date.now().toString();
         // Optimistic update - UI'a hemen ekle
         const patchResult = dispatch(
           api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
-            draft.data.unshift({ ...newPost, id: tempId });
+            draft.data.unshift({
+              _id: tempId,
+              ...newPost,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            });
             draft.total += 1;
             draft.totalPages = Math.ceil(draft.total / 10);
           })
@@ -84,7 +78,7 @@ export const api = createApi({
           // Başarılı olduğunda geçici post'u gerçek post ile değiştir
           dispatch(
             api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
-              const tempPost = draft.data.find((post) => post.id === tempId);
+              const tempPost = draft.data.find((post) => post._id === tempId);
               if (tempPost) {
                 Object.assign(tempPost, createdPost);
               }
@@ -98,17 +92,19 @@ export const api = createApi({
     }),
 
     // Post güncelle
-    updatePost: builder.mutation<Post, Partial<Post> & Pick<Post, "id">>({
-      query: ({ id, ...patch }) => ({
-        url: `/posts/${id}`,
+    updatePost: builder.mutation<Post, Partial<Post> & Pick<Post, "_id">>({
+      query: ({ _id, ...patch }) => ({
+        url: `/posts/${_id}`,
         method: "PATCH",
         body: patch,
       }),
-      invalidatesTags: (_result, _error, { id }) => [{ type: "Post", id }],
+      invalidatesTags: (_result, _error, { _id }) => [
+        { type: "Post", id: _id },
+      ],
     }),
 
     // Post sil
-    deletePost: builder.mutation<void, number>({
+    deletePost: builder.mutation<void, string>({
       query: (id) => ({
         url: `/posts/${id}`,
         method: "DELETE",
@@ -117,7 +113,7 @@ export const api = createApi({
         // Optimistic update - UI'dan hemen kaldır
         const patchResult = dispatch(
           api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
-            draft.data = draft.data.filter((post) => post.id !== id);
+            draft.data = draft.data.filter((post) => post._id !== id);
             draft.total -= 1;
             draft.totalPages = Math.ceil(draft.total / 10);
           })

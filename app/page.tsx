@@ -36,7 +36,7 @@ export default function Home() {
     }
   };
 
-  const handleDelete = async (postId: number) => {
+  const handleDelete = async (postId: string) => {
     try {
       await deletePost(postId).unwrap();
     } catch (error) {
@@ -135,11 +135,11 @@ export default function Home() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-8">
           {postsData?.data.map((post) => (
             <article
-              key={post.id}
+              key={post._id}
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300"
             >
               <div className="p-6">
-                <Link href={`/posts/${post.id}`} className="block">
+                <Link href={`/posts/${post._id}`} className="block">
                   <h2 className="text-xl font-bold text-gray-800 mb-3 hover:text-blue-600 transition duration-200">
                     {post.title}
                   </h2>
@@ -149,7 +149,7 @@ export default function Home() {
                 </p>
                 <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                   <button
-                    onClick={() => handleDelete(post.id)}
+                    onClick={() => handleDelete(post._id)}
                     className="text-red-500 hover:text-red-700 font-medium text-sm flex items-center gap-1 transition duration-200"
                   >
                     <svg
@@ -169,7 +169,7 @@ export default function Home() {
                     Sil
                   </button>
                   <Link
-                    href={`/posts/${post.id}`}
+                    href={`/posts/${post._id}`}
                     className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1 transition duration-200"
                   >
                     Devamını Oku
