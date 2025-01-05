@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGetPostsQuery } from "./store/services/api";
 import PostForm from "./components/PostForm";
@@ -17,15 +17,19 @@ export default function Home() {
 
   const { data, isLoading, error } = useGetPostsQuery({
     page: currentPage,
-    search: searchQuery,
+    search,
   });
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Her karakter değişiminde URL'i güncelle
+  useEffect(() => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     params.set("page", "1");
     router.push(`/?${params.toString()}`);
+  }, [search, router]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
   };
 
   const handlePageChange = (page: number) => {
@@ -36,7 +40,6 @@ export default function Home() {
 
   const clearSearch = () => {
     setSearch("");
-    router.push("/");
   };
 
   return (
@@ -46,21 +49,15 @@ export default function Home() {
 
         {/* Arama Formu */}
         <div className="my-8">
-          <form onSubmit={handleSearch} className="flex gap-4">
+          <div className="flex gap-4">
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleSearchChange}
               placeholder="Gönderilerde ara..."
               className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             />
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Ara
-            </button>
-            {searchQuery && (
+            {search && (
               <button
                 type="button"
                 onClick={clearSearch}
@@ -69,7 +66,7 @@ export default function Home() {
                 Temizle
               </button>
             )}
-          </form>
+          </div>
         </div>
 
         {isLoading ? (
