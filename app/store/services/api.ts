@@ -6,11 +6,13 @@ interface Post {
   content: string;
   createdAt: string;
   updatedAt: string;
+  isActive: boolean;
 }
 
 interface CreatePostRequest {
   title: string;
   content: string;
+  isActive?: boolean;
 }
 
 interface PaginatedResponse<T> {
@@ -87,7 +89,7 @@ export const api = createApi({
       ],
     }),
 
-    // Post sil
+    // Post sil (soft delete)
     deletePost: builder.mutation<void, string>({
       query: (id) => ({
         url: `/posts/${id}`,
@@ -96,10 +98,8 @@ export const api = createApi({
       invalidatesTags: (_result, _error, id) => [{ type: "Post", id }, "Post"],
       async onQueryStarted(id, { dispatch, queryFulfilled }) {
         try {
-          // Önce API isteğinin tamamlanmasını bekle
           await queryFulfilled;
 
-          // Sonra UI'ı güncelle
           dispatch(
             api.util.updateQueryData("getPosts", { page: 1 }, (draft) => {
               draft.data = draft.data.filter((post) => post._id !== id);
