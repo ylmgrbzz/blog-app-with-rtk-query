@@ -1,55 +1,76 @@
 # RTK Query Blog Uygulaması
 
-Modern ve kullanıcı dostu bir blog yönetim sistemi. Redux Toolkit Query, Next.js ve TailwindCSS kullanılarak geliştirilmiştir.
+Bu proje, Next.js 13+ App Router, RTK Query ve MongoDB kullanılarak geliştirilmiş modern bir blog uygulamasıdır.
 
-![RTK Query Blog](./preview.png)
+## Özellikler
 
-## 🚀 Özellikler
+- 📝 Blog gönderilerini görüntüleme, oluşturma, düzenleme ve silme
+- 🔄 RTK Query ile otomatik önbellek yönetimi ve optimistik güncellemeler
+- 📱 Responsive tasarım
+- 🎨 Tailwind CSS ile modern UI
+- 🗄️ MongoDB veritabanı entegrasyonu
+- 🚀 Next.js 13+ App Router ile gelişmiş performans
+- 🔍 Sayfalama desteği
+- 🗑️ Soft delete özelliği (Silinen gönderiler veritabanından silinmez, sadece gizlenir)
 
-- ✨ Modern ve responsive tasarım
-- 📱 Mobil uyumlu arayüz
-- 📝 Blog gönderisi oluşturma, düzenleme ve silme
-- 🔄 Sayfalama sistemi (her sayfada 10 gönderi)
-- ⚡ Optimistic Updates ile anlık UI güncellemeleri
-- 🎯 RTK Query ile etkin state yönetimi
-- 🎨 TailwindCSS ile modern görünüm
+## Teknolojiler
 
-## 🛠️ Teknolojiler
+- [Next.js 13+](https://nextjs.org/)
+- [Redux Toolkit](https://redux-toolkit.js.org/)
+- [RTK Query](https://redux-toolkit.js.org/rtk-query/overview)
+- [MongoDB](https://www.mongodb.com/)
+- [Mongoose](https://mongoosejs.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [TypeScript](https://www.typescriptlang.org/)
 
-- [Next.js](https://nextjs.org/) - React framework
-- [Redux Toolkit Query](https://redux-toolkit.js.org/rtk-query/overview) - Veri yönetimi
-- [TailwindCSS](https://tailwindcss.com/) - Stil ve tasarım
-- [TypeScript](https://www.typescriptlang.org/) - Tip güvenliği
+## Başlangıç
 
-### Blog Gönderisi Oluşturma
+1. Projeyi klonlayın:
+   \`\`\`bash
+   git clone [repo-url]
+   cd rtk-query-blog
+   \`\`\`
 
-- Ana sayfadaki form aracılığıyla yeni blog gönderisi oluşturabilirsiniz
-- Başlık ve içerik alanlarını doldurmanız yeterli
-- Gönderi otomatik olarak listenin en başına eklenecektir
+2. Bağımlılıkları yükleyin:
+   \`\`\`bash
+   npm install
+   \`\`\`
 
-### Gönderileri Görüntüleme
+3. `.env.local` dosyası oluşturun ve MongoDB bağlantı bilgilerinizi ekleyin:
+   \`\`\`
+   MONGODB_URI=your_mongodb_connection_string
+   \`\`\`
 
-- Ana sayfada tüm gönderiler listelenir
-- Her sayfada 10 gönderi gösterilir
-- Sayfalama kontrolleri ile gönderiler arasında gezinebilirsiniz
+4. Geliştirme sunucusunu başlatın:
+   \`\`\`bash
+   npm run dev
+   \`\`\`
 
-### Gönderi Düzenleme ve Silme
+5. Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresini açın.
 
-- Her gönderinin detay sayfasında düzenleme yapabilirsiniz
-- Silme işlemi hem ana sayfadan hem de detay sayfasından yapılabilir
-- Tüm değişiklikler anlık olarak UI'da görüntülenir
-
-## 📝 Proje Yapısı
+## Proje Yapısı
 
 \`\`\`
 rtk-query-blog/
 ├── app/
-│ ├── posts/ # Post detay sayfaları
+│ ├── api/ # API route'ları
+│ ├── components/ # Paylaşılan bileşenler
+│ ├── models/ # Mongoose modelleri
+│ ├── posts/ # Post sayfaları
 │ ├── store/ # Redux store ve RTK Query servisleri
-│ ├── layout.tsx # Ana sayfa düzeni
+│ ├── utils/ # Yardımcı fonksiyonlar
+│ ├── layout.tsx # Root layout
 │ └── page.tsx # Ana sayfa
 ├── public/ # Statik dosyalar
 ├── styles/ # Global stiller
-├── package.json # Proje bağımlılıkları
-└── README.md # Proje dokümantasyonu
+├── .env.local # Ortam değişkenleri
+└── package.json
 \`\`\`
+
+## API Endpoints
+
+- `GET /api/posts` - Tüm aktif gönderileri getir (sayfalama destekli)
+- `GET /api/posts/:id` - Belirli bir gönderiyi getir
+- `POST /api/posts` - Yeni gönderi oluştur
+- `PATCH /api/posts/:id` - Gönderiyi güncelle
+- `DELETE /api/posts/:id` - Gönderiyi soft delete ile gizle
