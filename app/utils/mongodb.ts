@@ -1,40 +1,23 @@
 import mongoose from "mongoose";
 
-if (!process.env.MONGODB_URI) {
-  throw new Error("MONGODB_URI is not defined in environment variables");
-}
-
 const MONGODB_URI = process.env.MONGODB_URI;
 
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+if (!MONGODB_URI) {
+  throw new Error(
+    "MongoDB URI bulunamadı. Lütfen .env.local dosyasında MONGODB_URI'yi tanımlayın."
+  );
 }
 
-async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
-  }
-
+export default async function connectDB() {
   try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
+    if (mongoose.connections[0].readyState) {
+      return;
+    }
+
+    await mongoose.connect(MONGODB_URI);
+    console.log("MongoDB bağlantısı başarılı!");
+  } catch (error) {
+    console.error("MongoDB bağlantı hatası:", error);
+    throw error;
   }
-
-  return cached.conn;
 }
-
-export default connectDB;

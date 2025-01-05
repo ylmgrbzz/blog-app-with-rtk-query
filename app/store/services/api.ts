@@ -25,6 +25,7 @@ interface PaginatedResponse<T> {
 interface GetPostsArgs {
   page: number;
   limit?: number;
+  search?: string;
 }
 
 export const api = createApi({
@@ -36,11 +37,12 @@ export const api = createApi({
   endpoints: (builder) => ({
     // Tüm postları getir (Sayfalı)
     getPosts: builder.query<PaginatedResponse<Post>, GetPostsArgs>({
-      query: ({ page, limit = 10 }) => ({
+      query: ({ page, limit = 10, search }) => ({
         url: "/posts",
         params: {
           _page: page,
           _limit: limit,
+          search,
         },
       }),
       providesTags: ["Post"],
@@ -72,7 +74,7 @@ export const api = createApi({
             })
           );
         } catch {
-          // Hata durumunda bir şey yapma
+          console.log("Error creating post");
         }
       },
     }),
@@ -108,6 +110,7 @@ export const api = createApi({
             })
           );
         } catch {
+          console.log("Error deleting post");
           // Hata durumunda bir şey yapma
         }
       },
