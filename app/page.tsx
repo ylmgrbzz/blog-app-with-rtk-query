@@ -138,6 +138,8 @@ export default function Home() {
               key={post._id}
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300"
             >
+              {post.isActive && <span className="text-green-500">Active</span>}
+
               <div className="p-6">
                 <Link href={`/posts/${post._id}`} className="block">
                   <h2 className="text-xl font-bold text-gray-800 mb-3 hover:text-blue-600 transition duration-200">

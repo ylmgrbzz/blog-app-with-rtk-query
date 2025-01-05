@@ -57,7 +57,11 @@ export async function DELETE(
   try {
     await connectDB();
 
-    const post = await Post.findByIdAndDelete(params.id);
+    const post = await Post.findByIdAndUpdate(
+      params.id,
+      { isActive: false },
+      { new: true }
+    );
     if (!post) {
       return NextResponse.json({ error: "Post bulunamadı" }, { status: 404 });
     }

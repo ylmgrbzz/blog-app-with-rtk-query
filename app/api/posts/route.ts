@@ -12,7 +12,9 @@ export async function GET(request: Request) {
     const skip = (page - 1) * limit;
 
     const total = await Post.countDocuments();
-    const posts = await Post.find({})
+    const posts = await Post.find({
+      isActive: true,
+    })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
