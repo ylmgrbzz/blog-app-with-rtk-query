@@ -10,8 +10,11 @@ import Pagination from "./components/Pagination";
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  console.log(searchParams);
   const currentPage = Number(searchParams.get("page")) || 1;
+  console.log(currentPage);
   const searchQuery = searchParams.get("search") || "";
+  console.log(searchQuery);
 
   const [search, setSearch] = useState(searchQuery);
 

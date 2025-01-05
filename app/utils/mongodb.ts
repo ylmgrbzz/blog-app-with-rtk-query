@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
+if (!process.env.MONGODB_URI) {
   throw new Error(
     "MongoDB URI bulunamadı. Lütfen .env.local dosyasında MONGODB_URI'yi tanımlayın."
   );
 }
+
+const MONGODB_URI: string = process.env.MONGODB_URI;
 
 export default async function connectDB() {
   try {
